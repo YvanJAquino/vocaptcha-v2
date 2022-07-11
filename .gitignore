@@ -1,0 +1,4 @@
+__pycache__/
+service/__pycache__/
+plugins/__pycache__/
+tests/__pycache__/
