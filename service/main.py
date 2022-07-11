@@ -1,19 +1,13 @@
-from google.cloud import firestore
+import yaml
 
-from vocaptcha.server import VoCaptchaServer
+from vocaptcha.server import VoCaptchaServer, VoCaptchaManager
 
-plugins = {
-    'nato_alpha': 'NATOAlphaPlugin',
-    'sentences': 'SentencesPlugin',
-    'add_numbers': 'AddTwoNumbersPlugin'
-}
-fs = firestore.Client()
-collection = fs.collection('vocaptcha-v3-plugins')
-plugin_folder = 'plugins'
+manager = VoCaptchaManager()
+config = manager.config
 
 app = VoCaptchaServer(
-    plugins=plugins,
-    collection=collection,
-    plugin_folder=plugin_folder
+    plugins=config.plugins,
+    collection=config.collection,
+    plugin_folder=config.pluginFolder
 )
 

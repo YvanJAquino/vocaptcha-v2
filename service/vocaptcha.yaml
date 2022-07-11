@@ -1,0 +1,9 @@
+plugins:
+  - module: nato_alpha
+    cls: NATOAlphaPlugin
+  - module: sentences
+    cls: SentencesPlugin
+  - module: add_numbers
+    cls: AddTwoNumbersPlugin
+collection: vocaptcha-v3-plugins
+pluginFolder: plugins

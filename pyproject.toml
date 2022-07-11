@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "vocaptcha-v3"
+name = "vocaptcha-v2"
 version = "0.3.1"
 description = ""
 authors = ["Yvan Aquino <yaquino@google.com>"]

@@ -1,5 +1,4 @@
 from random import randint
-from string import ascii_lowercase
 from cxwebhooks import WebhookRequest, WebhookResponse
 
 from vocaptcha.plugins import VoCaptchaPlugin

@@ -1,5 +1,4 @@
 from secrets import SystemRandom
-from string import ascii_lowercase
 
 from fuzzywuzzy import fuzz
 
