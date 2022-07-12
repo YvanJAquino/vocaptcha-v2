@@ -54,8 +54,175 @@ The response cache is responsible for managing the state of response materials. 
 
 # Key Technologies
 
-voCAPTCHA v2 is built with Python using the following open source frameworks:
+voCAPTCHA v2 is built with Python using the following frameworks and technologies:
 
 - Starlette: Starlette is a lightweight ASGI framework/toolkit, which is ideal for building async web services in Python.
 
 - Pydantic: Data validation and settings management using python type annotations.  
+
+- Google Cloud Firestore: Google Cloud's serverless real-time NoSQL Database with live synchronization capabilities.
+
+# Plug-ins Architecture
+
+In computing, a plug-in (or plugin, add-in, addin, add-on, or addon) is a software component that adds a specific feature to an existing computer program. When a program supports plug-ins, it enables customization.
+
+voCAPTCHA is extensible - customer's are welcome to and encouraged to bring their own challenge generation solutions via the creation of a VoCaptchaPlugin.  
+
+## Plugins
+
+voCAPTCHA v2 is a Python application which means plugins are written in Python.  
+
+New plugin's can be created by creating a new Python module in the plugins folder.  
+
+```diff
+.
+├── Dockerfile
+├── README.md
+├── cloudbuild.yaml
+├── poetry.lock
+├── pyproject.toml
+├── service
+│   ├── __init__.py
+│   ├── main.py
+│   ├── plugins <- ! THIS IS THE PLUGINS FOLDER!
+│   │   ├── add_numbers.py
+│   │   ├── nato_alpha.py
+│   │   └── sentences.py
+│   ├── vocaptcha <- ! THIS IS THE VOCAPTCHA CORE FOLDER
+│   │   ├── cache.py
+│   │   ├── plugins.py <- THIS IS WHERE THE VoCaptchaPlugin base class lives!
+│   │   └── server.py
+│   └── vocaptcha.yaml
+└── tests
+    └── __init__.py
+```
+
+The module itself needs to (at a minimum) hold a class that sub-classes the VoCaptchaPlugin abstract base class located under the vocaptcha folder.  
+
+```python
+# service/plugins/my_plugin.py
+
+from vocaptcha.plugins import VoCaptchaPlugin
+
+
+class MyVeryOwnPlugin(VoCaptchaPlugin):
+
+    MOUNT = "/my-very-own-plugin"
+    TYPE = "custom-plugin"
+    DOC = "custom-plugin"
+    PARAMS = None
+
+    ...
+```
+
+The VoCaptchaPlugin base class requires you to implement two methods: `generate` and `verify`.  To work properly, the signature for those methods MUST be of this format:
+
+```python
+async def generate(self, webhook: WebhookRequest, templates=..., response=...):
+    ...
+```
+
+Behind the scenes, the plugin base class stages some transformations, validations, and also instantiates objects (like the WebhookResponse object) so the user doesn't need to.  
+
+The function should generate a challenge, update any templates with those challenge materials and return the response object (which is injected via the response key word argument at runtime.)
+
+```python
+async def generate(
+    self, 
+    webhook: WebhookRequest, 
+    templates=..., 
+    response=...
+):
+    # you can define other methods, too
+    # Here, the challenge method is definedfor challenge generation.
+    challenge = self.challenge() 
+    # Update the templates
+    text = templates['generate']['text'].format(challenge=challenge)
+    ssml = templates['generate']['ssml'].format(challenge=challenge)
+    # Update the WebhookResponse object
+    response.add_text_response(text)
+    response.add_audio_text_response(ssml)
+    response.add_session_params({
+        "challenge": " ".join(words),
+        "challenge-type": self.TYPE
+    })
+    # Return the response object.  
+    return response
+```
+
+The verify method works in nearly the same way.  See the plugins folder for more examples.
+
+The VoCaptchaPlugin class provides a couple of out-of-the-box helper methods that provide integration with the ResponseCache which keeps a copy of all VoCaptcha response materials in memory and in-sync with Firestore where those definitions live.
+
+```python
+    def get_challenges(self):
+        """
+            responsible for getting challenges from the cache.
+        """
+        document = self.cache.get(self.doc)
+        challenges = document.get(CHALLENGES)
+        if not challenges:
+            raise NotImplementedError("No challenges found!  Please review.")
+        return challenges
+
+    def get_templates(self):
+        """
+            responsible for getting response templates from the cache.
+        """
+        document = self.cache.get(self.doc)
+        templates = document.get(TEMPLATES)
+        if not templates:
+            raise NotImplementedError("No templates found!  Please review.")
+        return templates
+```
+
+By using Firestore, the response messages and the challenge materials are fully decoupled from the application - and still keep the cache in sync with the source of truth.  This, in turn, allows customers to update the response and challenge materials in real-time without having to rebuild the application.
+
+If voCAPTCHA v2 is up-and-running, you can change the format of the response message from within Firestore and you can also add more challenge materials dynamically by updating the document that contains that information.  
+
+## The ResponseCache
+
+The ResponseCache is a concurrency safe wrapper around Firestore's "watcher" method for queries, collections, and documents: on_snapshot, which starts listening for changes to the provided Firestore reference object on a separate background thread.  
+
+When updates are detected, a mutex lock is used to prevent access - preventing the corruption of data in-transit.  
+
+Changes don't happen frequently, but when they do, it's the ResponseCache's job to ensure that those changes are propagated in near real-time.  
+
+```python
+from threading import Lock
+
+
+class ResponseCache:
+
+    def __init__(
+        self,
+        collection = None
+    ):
+        self.cache = {}
+        self.lock = Lock()
+        self.watcher = None
+        self.collection = collection
+
+    def callback(self, snaps, changes, read_time):
+        for doc in snaps:
+            id, data = doc.id, doc.to_dict()
+            # Only update the changes.
+            if id not in self.cache or self.cache.get(id) != data:
+                # threading.Lock (mutex)
+                with self.lock:
+                    self.cache[doc.id] = data
+
+    def watch(self, query=None):
+        if not query:
+            query = self.collection
+        self.watcher = query.on_snapshot(self.callback)
+
+    def get(self, key):
+        # Lock during reading as well.  
+        with self.lock:
+            value = self.cache.get(key)
+        if not value:
+            raise KeyError(f"Key {key} doesn't exist in the cache.")
+        else:
+            return value
+```
