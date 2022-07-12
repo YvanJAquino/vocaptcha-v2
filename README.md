@@ -30,7 +30,9 @@ The final piece of the ADDF is the response cache which is responsible for keepi
 
 
 The server is responsible for delivering the API surface, the endpoints and paths that provide fulfillment to the ADDF Agent.  
+
 It is responsible for discovering and registering plugins in addition to API endpoint route creation.  The server can run anywhere where containers are accepted such as on a VM running Container Optimized OS, a Kubernetes cluster, or even on a containers-as-a-service like Cloud Run.  
+
 The ADDF server is stateless and can be run in a just-in-time fashion - it can be an ephemeral resource as opposed to a static, fixed one.  
 
 
@@ -48,6 +50,7 @@ Using a plugins based architecture allows the Fulfillment Layer to be user exten
 The response cache is responsible for managing the state of response materials.  Its process runs on a separate thread, listening for and making updates in real time.  It is safe for concurrent use.  The architectural decision to use an in-memory cache has a number of benefits:
 
 - It de-couples “response” materials and data from the container.  When the customer needs to update a list of sentences used in challenge generation, they don’t need to ‘rebuild a container’ or re-release a new service.  Instead, they can update those definitions via a database (Firestore in this case) which provides real time updates, allowing the response cache to update itself as well for any running instances. 
+
 - Consequently, keeping an in-memory representation of “response” materials allows ADDF Server to reduce the number of calls made to the data provider as well.  If no updates are made only one API call is made to the database during initialization.  
 
 - It reduces the amount of round-trip latency between the Conversational Layer and the Fulfillment Layer.  No extra web service calls are made - the data is local to the ADDF server instance immediately - saving 15 milliseconds per interaction on average. 
