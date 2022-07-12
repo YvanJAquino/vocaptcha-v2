@@ -99,6 +99,10 @@ New plugin's can be created by creating a new Python module in the plugins folde
 
 The module itself needs to (at a minimum) hold a class that sub-classes the VoCaptchaPlugin abstract base class located under the vocaptcha folder.  
 
+Notice that CLASS attributes (MOUNT, TYPE, DOC, PARAMS) have been exposed for convenience.  
+
+By using class attributes like this, the need to define an `__init__` method is circumvented; and anything that's exposed as a class attribute is and should be a constant within the plugin.   
+
 ```python
 # service/plugins/my_plugin.py
 
@@ -107,6 +111,7 @@ from vocaptcha.plugins import VoCaptchaPlugin
 
 class MyVeryOwnPlugin(VoCaptchaPlugin):
 
+    # CLASS ATTRIBUTES
     MOUNT = "/my-very-own-plugin"
     TYPE = "custom-plugin"
     DOC = "custom-plugin"
@@ -114,6 +119,15 @@ class MyVeryOwnPlugin(VoCaptchaPlugin):
 
     ...
 ```
+
+The MOUNT class attribute represents the root path of the plugin.  Given ```MOUNT="/coffee-types"```, the routes created would be `/coffee-types/generate` and `/coffee-types/verify`.  
+
+The TYPE class attribute is used as metadata.  The virtual agent uses this to confirm that the challenge response and request type match - just as a security check.  
+
+The DOC class attribute is responsible for mapping the Plugin's response and challenge materials from Firestore.  It represents the documents name.  
+
+The PARAMS class attribute is optional.  PARAMS exposes parameters that may be tweaked, typically for challenge generation - but these PARAMS can be used within the generate and verify methods as well.  
+
 
 The VoCaptchaPlugin base class requires you to implement two methods: `generate` and `verify`.  To work properly, the signature for those methods MUST be of this format:
 
