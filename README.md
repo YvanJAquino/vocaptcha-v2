@@ -52,15 +52,6 @@ The response cache is responsible for managing the state of response materials. 
 
 - It reduces the amount of round-trip latency between the Conversational Layer and the Fulfillment Layer.  No extra web service calls are made - the data is local to the ADDF server instance immediately - saving 15 milliseconds per interaction on average. 
 
-# Key Technologies
-
-voCAPTCHA v2 is built with Python using the following frameworks and technologies:
-
-- Starlette: Starlette is a lightweight ASGI framework/toolkit, which is ideal for building async web services in Python.
-
-- Pydantic: Data validation and settings management using python type annotations.  
-
-- Google Cloud Firestore: Google Cloud's serverless real-time NoSQL Database with live synchronization capabilities.
 
 # Plug-ins Architecture
 
@@ -196,47 +187,84 @@ If voCAPTCHA v2 is up-and-running, you can change the format of the response mes
 
 ## The ResponseCache
 
-The ResponseCache is a concurrency safe wrapper around Firestore's "watcher" method for queries, collections, and documents: on_snapshot, which starts listening for changes to the provided Firestore reference object on a separate background thread.  
+The ResponseCache is a concurrency safe wrapper around Firestore's "watcher" method for queries, collections, and documents: `on_snapshot`, which starts listening for changes to the provided Firestore reference object on a separate background thread.  
 
 When updates are detected, a mutex lock is used to prevent access - preventing the corruption of data in-transit.  
 
 Changes don't happen frequently, but when they do, it's the ResponseCache's job to ensure that those changes are propagated in near real-time.  
 
-```python
-from threading import Lock
 
+## voCAPTCHA Config: vocaptcha.yaml
 
-class ResponseCache:
+At this time, voCAPTCHA's plugin discovery and plugin registration is done manually via a configuration file which exposes a limited number of configuration options.
 
-    def __init__(
-        self,
-        collection = None
-    ):
-        self.cache = {}
-        self.lock = Lock()
-        self.watcher = None
-        self.collection = collection
-
-    def callback(self, snaps, changes, read_time):
-        for doc in snaps:
-            id, data = doc.id, doc.to_dict()
-            # Only update the changes.
-            if id not in self.cache or self.cache.get(id) != data:
-                # threading.Lock (mutex)
-                with self.lock:
-                    self.cache[doc.id] = data
-
-    def watch(self, query=None):
-        if not query:
-            query = self.collection
-        self.watcher = query.on_snapshot(self.callback)
-
-    def get(self, key):
-        # Lock during reading as well.  
-        with self.lock:
-            value = self.cache.get(key)
-        if not value:
-            raise KeyError(f"Key {key} doesn't exist in the cache.")
-        else:
-            return value
+```yaml
+plugins:
+  - module: nato_alpha
+    cls: NATOAlphaPlugin
+  - module: sentences
+    cls: SentencesPlugin
+  - module: add_numbers
+    cls: AddTwoNumbersPlugin
+collection: vocaptcha-v3-plugins
+pluginFolder: plugins
 ```
+
+- plugins is a list of module and class pair maps
+- collection is the name of the collection in Firestore that holds challenge and template materials
+- pluginFolder is where the voCAPTCHA server process will look for the listed plugins.  This shouldn't need a change - but is included for advanced use.
+
+Changes to this configuration WILL require a re-building of the container - but this makes sense.  if plugins are being added or removed, a rebuilding, for security reasons, should happen.
+
+## ResponseCache Collection and Documents
+
+Each Plugin has it's response and challenge materials de-coupled from it's definition.  The data lives inside a collection in Firestore and each plugin is represented by a Firestore Document that the Response Cache watches for changes.
+
+The document is composed of two main sections:  challenges and templates.  Challenges hold challenge materials in whatever format you need (either a map or a list) and the response templates house the string templates used to generate responses.  
+
+```json
+{
+    "challenges": [
+        "Coffee is best served hot or cold",
+        "The rain in Spain stays mainly in the plain",
+        "It is time to pay taxes"
+    ],
+    "templates": [{
+        "generate": {
+            "text": "Please repeat the following sentence after me: {sentence}",
+            "ssml": "Please repeat the following sentence after me: {sentence}"
+            }
+        },
+        {
+        "verify": {
+            "text": "Cool.  We sent you the following sentence: {challenge} and you responded: {challenge_response}.  These two {match}.",
+            "ssml": "Cool.  We sent you the following sentence: {challenge} and you responded: {challenge_response}.  These two {match}."
+            }
+        }
+    ]
+}
+```
+
+You can change the general format of the templates and where those parameters will go within the string 
+
+```diff
+
+- "Cool.  We sent you the following sentence: {challenge} and you responded: {challenge_response}.  These two {match}."
++ These two {match}.  Your response was: {challenge_response} and the challenge was: {challenge}.  "
+```
+
+The generate and verify methods are responsible for passing the parameters and filling the template out via the str.format python built-in.
+
+# Key Technologies
+
+voCAPTCHA v2 is built with Python using the following frameworks and technologies:
+
+- Starlette: Starlette is a lightweight ASGI framework/toolkit, which is ideal for building async web services in Python.
+
+- Pydantic: Data validation and settings management using python type annotations.  
+
+- Google Cloud Firestore: Google Cloud's serverless real-time NoSQL Database with live synchronization capabilities.
+
+- Google Cloud Build: Serverless CI/CD - perfect for using with GKE and Cloud Run.
+
+- Google Cloud Run: Run highly scalable containerized applications on a fully managed serverless platform.
