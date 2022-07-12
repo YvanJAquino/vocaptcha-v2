@@ -142,7 +142,7 @@ async def generate(
     response=...
 ):
     # you can define other methods, too
-    # Here, the challenge method is definedfor challenge generation.
+    # Here, the challenge method is defined for challenge generation.
     challenge = self.challenge() 
     # Update the templates
     text = templates['generate']['text'].format(challenge=challenge)

@@ -67,11 +67,12 @@ class VoCaptchaPlugin(ABC):
         """
             need to test and see if partial is working as desired.
         """
+        mount_name = self.MOUNT.replace("/", "")
         generate = partial(self.adapt, endpoint=self.generate)
         verify = partial(self.adapt, endpoint=self.verify)
-        mount = Mount(self.mount, routes=[
-            Route("/generate", generate, methods=["GET", "POST"]),
-            Route("/verify", verify, methods=["GET", "POST"])
+        mount = Mount(self.mount, name=mount_name, routes=[
+            Route("/generate", generate, methods=["GET", "POST"], name="generate"),
+            Route("/verify", verify, methods=["GET", "POST"], name="verify")
         ])
         return mount
 
