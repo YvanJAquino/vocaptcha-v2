@@ -12,8 +12,3 @@ app = VoCaptchaServer(
     agent_name=config.agentName,
     flow_name=config.flowName
 )
-
-# print(app.current_pages.keys())
-# print(app.plugin_pages.keys())
-# print(app.plugin_webhooks.keys())
-print(app.inject_pages())
