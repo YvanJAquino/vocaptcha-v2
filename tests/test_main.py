@@ -1,11 +1,40 @@
-from fastapi.testclient import TestClient
+import os
+import json
+from starlette.testclient import TestClient
 
-from service.main import app
+from service.vocaptcha.server import VoCaptchaServer, VoCaptchaManager
 
-client = TestClient(app)
+manager = VoCaptchaManager(
+    # Have to patch-in the config.
+    path="service/vocaptcha.yaml"
+)
 
+config = manager.config
 
-def test_read_main():
-    response = client.get("/")
+factory = VoCaptchaServer(
+    plugins=config.plugins,
+    collection=config.collection,
+    plugin_folder=config.pluginFolder,
+    agent_name=config.agentName,
+    flow_name=config.flowName
+)
+
+service = TestClient(app)
+
+def test_working_directory():
+    cwd = os.getcwd()
+    print(f"CURRENT WORKING DIR: {cwd}")
+
+def test_cache():
+    collection = config.collection
+    for doc in collection.stream():
+        print(doc.to_dict())
+    print(factory.cache.cache)
+
+def test_generate_add_two_numbers():
+    with open("tests/cases/generate_add_two_numbers.json") as src:
+        payload = json.load(src)
+    response = service.post("/add-two-numbers/generate", json=payload)
     assert response.status_code == 200
-    assert response.json() == {"msg": "Hello World"}
+    print(response.json())
+    

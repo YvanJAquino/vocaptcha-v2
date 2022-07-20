@@ -2,7 +2,7 @@ from secrets import SystemRandom
 from string import ascii_lowercase
 from cxwebhooks import WebhookRequest, WebhookResponse
 
-from vocaptcha.plugins import VoCaptchaPlugin
+from service.vocaptcha.plugins import VoCaptchaPlugin
 
 
 class NATOAlphaPlugin(VoCaptchaPlugin):
@@ -60,7 +60,8 @@ class NATOAlphaPlugin(VoCaptchaPlugin):
             return response
         challenge_response = parameters.get('challenge-response')
         match = 'match' if challenge == challenge_response else "don't match"
-        text = templates['generate']['text'].format(
+        is_match = True if match == 'match' else False
+        text = templates['verify']['text'].format(
             challenge=challenge,
             challenge_response=challenge_response,
             match=match
@@ -68,6 +69,7 @@ class NATOAlphaPlugin(VoCaptchaPlugin):
         response.add_text_response(text)
         response.add_audio_text_response(text)
         response.add_session_params({
-            "challenge-response": challenge_response
+            "challenge-response": challenge_response,
+            "challenge-passed": is_match
         })
         return response

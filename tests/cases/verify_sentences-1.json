@@ -1,0 +1,22 @@
+{
+    "detectIntentResponseId": "61347daa-face-4fd6-98e7-e9fd91492bd4",
+    "pageInfo": {
+      "currentPage": "projects/vocal-etching-343420/locations/global/agents/f4eb9e75-74a5-40c9-b1f2-c1bdb6aea6fc/flows/00000000-0000-0000-0000-000000000000/pages/3be97067-bb20-4ca2-98c0-57fb6bb7dedd",
+      "displayName": "verify-sentence-challenge"
+    },
+    "sessionInfo": {
+      "session": "projects/vocal-etching-343420/locations/global/agents/f4eb9e75-74a5-40c9-b1f2-c1bdb6aea6fc/sessions/dc866c-b2d-dcf-997-af2d90f8f",
+      "parameters": {
+        "challenge": "The rain in Spain stays mainly in the plain",
+        "challenge-count": 0.0,
+        "challenge-response": "The rain in Spain stays mainly in the plain",
+        "challenge-type": "sentence-repetition",
+        "which-challenge": 0.5226772185682707
+      }
+    },
+    "fulfillmentInfo": {
+      "tag": "verify_sentences"
+    },
+    "text": "The rain in Spain stays mainly in the plain",
+    "languageCode": "en"
+  }

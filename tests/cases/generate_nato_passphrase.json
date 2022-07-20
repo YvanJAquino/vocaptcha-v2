@@ -1,0 +1,32 @@
+{
+    "detectIntentResponseId": "43428fe3-41b5-4bec-a7c3-784d1c4c17d7",
+    "intentInfo": {
+      "lastMatchedIntent": "projects/vocal-etching-343420/locations/global/agents/f4eb9e75-74a5-40c9-b1f2-c1bdb6aea6fc/intents/00000000-0000-0000-0000-000000000000",
+      "displayName": "Default Welcome Intent",
+      "confidence": 1.0
+    },
+    "pageInfo": {
+      "currentPage": "projects/vocal-etching-343420/locations/global/agents/f4eb9e75-74a5-40c9-b1f2-c1bdb6aea6fc/flows/00000000-0000-0000-0000-000000000000/pages/602a3d49-38e9-47a0-9a90-f17283cfcf22",
+      "displayName": "generate-nato-challenge"
+    },
+    "sessionInfo": {
+      "session": "projects/vocal-etching-343420/locations/global/agents/f4eb9e75-74a5-40c9-b1f2-c1bdb6aea6fc/sessions/2d909f-8f0-5bc-94c-7ba8fe2cd",
+      "parameters": {
+        "challenge-count": 0.0,
+        "which-challenge": 0.09729061838812192
+      }
+    },
+    "fulfillmentInfo": {
+      "tag": "generate_nato_passphrase"
+    },
+    "messages": [{
+      "text": {
+        "text": ["Hello! How can I help you?"],
+        "redactedText": ["Hello! How can I help you?"]
+      },
+      "responseType": "HANDLER_PROMPT",
+      "source": "VIRTUAL_AGENT"
+    }],
+    "text": "hi",
+    "languageCode": "en"
+  }

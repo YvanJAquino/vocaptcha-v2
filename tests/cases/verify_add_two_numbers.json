@@ -1,0 +1,22 @@
+{
+    "detectIntentResponseId": "b999ff7a-4c9e-43f5-8889-7c0c378608db",
+    "pageInfo": {
+      "currentPage": "projects/vocal-etching-343420/locations/global/agents/f4eb9e75-74a5-40c9-b1f2-c1bdb6aea6fc/flows/00000000-0000-0000-0000-000000000000/pages/eeb790a0-2295-47e4-b513-bec5d4aaa705",
+      "displayName": "verify-add-numbers"
+    },
+    "sessionInfo": {
+      "session": "projects/vocal-etching-343420/locations/global/agents/f4eb9e75-74a5-40c9-b1f2-c1bdb6aea6fc/sessions/a114e8-256-941-43d-c205720bc",
+      "parameters": {
+        "challenge": 9.0,
+        "challenge-count": 0.0,
+        "challenge-response": 9.0,
+        "challenge-type": "add-two-numbers",
+        "which-challenge": 0.9938347934099138
+      }
+    },
+    "fulfillmentInfo": {
+      "tag": "verify-add-two-numbers"
+    },
+    "text": "9",
+    "languageCode": "en"
+  }

@@ -1,0 +1,22 @@
+{
+    "detectIntentResponseId": "8936a021-95cc-4eb8-9f4d-e31759c2c390",
+    "pageInfo": {
+      "currentPage": "projects/vocal-etching-343420/locations/global/agents/f4eb9e75-74a5-40c9-b1f2-c1bdb6aea6fc/flows/00000000-0000-0000-0000-000000000000/pages/67639244-378c-48d0-b660-ce90b3dee953",
+      "displayName": "verify-nato-challenge"
+    },
+    "sessionInfo": {
+      "session": "projects/vocal-etching-343420/locations/global/agents/f4eb9e75-74a5-40c9-b1f2-c1bdb6aea6fc/sessions/2d3f64-8f5-de1-1f4-497df88d6",
+      "parameters": {
+        "challenge": "yankee charlie lima",
+        "challenge-count": 0.0,
+        "challenge-response": "yankee charlie lima",
+        "challenge-type": "nato-alphabet-passphrase",
+        "which-challenge": 0.17837318782675127
+      }
+    },
+    "fulfillmentInfo": {
+      "tag": "verify_nato_passphrase"
+    },
+    "text": "yankee charlie lima",
+    "languageCode": "en"
+  }

@@ -1,3 +1,4 @@
+import os
 import time
 import importlib
 import yaml
@@ -9,8 +10,8 @@ from google.cloud import firestore
 from google.cloud.firestore import CollectionReference
 from google.cloud import dialogflowcx_v3 as cx
 
-from vocaptcha.plugins import VoCaptchaPlugin, Webhooks
-from vocaptcha.cache import ResponseCache
+from service.vocaptcha.plugins import VoCaptchaPlugin, Webhooks
+from service.vocaptcha.cache import ResponseCache
 
 from pydantic import BaseModel
 
@@ -54,6 +55,7 @@ class VoCaptchaManager:
     """
 
     def __init__(self, path = "vocaptcha.yaml"):
+        print(f"Current working directory: {os.getcwd()}")
         with open(path) as src:
             config = yaml.load(src, Loader=yaml.Loader)
         self.config = VoCaptchaConfig(**config)
@@ -114,7 +116,7 @@ class VoCaptchaServer:
         """
         routes = []
         for plugin in self.plugins:
-            module_path = f'{self.plugin_folder}.{plugin.module}'
+            module_path = f'service.{self.plugin_folder}.{plugin.module}'
             module = importlib.import_module(module_path)
             plugin = getattr(module, plugin.cls)
             instance = plugin(

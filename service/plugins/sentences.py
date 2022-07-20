@@ -3,7 +3,7 @@ from secrets import SystemRandom
 from fuzzywuzzy import fuzz
 
 from cxwebhooks import WebhookRequest, WebhookResponse
-from vocaptcha.plugins import VoCaptchaPlugin
+from service.vocaptcha.plugins import VoCaptchaPlugin
 
 
 class SentencesPlugin(VoCaptchaPlugin):
@@ -51,8 +51,10 @@ class SentencesPlugin(VoCaptchaPlugin):
             return response
         challenge_response = parameters.get('challenge-response')
         ratio = fuzz.ratio(challenge, challenge_response)
+        print("FUZZ RATIO: ", ratio)
         match = 'match' if ratio > 80 else "don't match"
-        text = templates['generate']['text'].format(
+        is_match = True if match == 'match' else False
+        text = templates['verify']['text'].format(
             challenge=challenge,
             challenge_response=challenge_response,
             match=match
@@ -60,6 +62,7 @@ class SentencesPlugin(VoCaptchaPlugin):
         response.add_text_response(text)
         response.add_audio_text_response(text)
         response.add_session_params({
-            "challenge-response": challenge_response
+            "challenge-response": challenge_response,
+            "challenge-passed": is_match
         })
         return response

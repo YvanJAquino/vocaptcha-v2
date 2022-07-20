@@ -1,7 +1,7 @@
 from random import randint
 from cxwebhooks import WebhookRequest, WebhookResponse
 
-from vocaptcha.plugins import VoCaptchaPlugin
+from service.vocaptcha.plugins import VoCaptchaPlugin
 
 
 class AddTwoNumbersPlugin(VoCaptchaPlugin):

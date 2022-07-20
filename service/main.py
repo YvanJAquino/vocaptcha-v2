@@ -1,6 +1,6 @@
 import yaml
 
-from vocaptcha.server import VoCaptchaServer, VoCaptchaManager
+from service.vocaptcha.server import VoCaptchaServer, VoCaptchaManager
 
 manager = VoCaptchaManager()
 config = manager.config

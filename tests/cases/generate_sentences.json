@@ -1,0 +1,32 @@
+{
+    "detectIntentResponseId": "bc59a8da-405a-44c9-8867-02e4dff50cb1",
+    "intentInfo": {
+      "lastMatchedIntent": "projects/vocal-etching-343420/locations/global/agents/f4eb9e75-74a5-40c9-b1f2-c1bdb6aea6fc/intents/00000000-0000-0000-0000-000000000000",
+      "displayName": "Default Welcome Intent",
+      "confidence": 1.0
+    },
+    "pageInfo": {
+      "currentPage": "projects/vocal-etching-343420/locations/global/agents/f4eb9e75-74a5-40c9-b1f2-c1bdb6aea6fc/flows/00000000-0000-0000-0000-000000000000/pages/180abc45-43d5-43b5-bcfb-01d90934b1a5",
+      "displayName": "generate-sentence-challenge"
+    },
+    "sessionInfo": {
+      "session": "projects/vocal-etching-343420/locations/global/agents/f4eb9e75-74a5-40c9-b1f2-c1bdb6aea6fc/sessions/71c3a9-ffc-d46-294-da846e579",
+      "parameters": {
+        "challenge-count": 0.0,
+        "which-challenge": 0.6067985265907525
+      }
+    },
+    "fulfillmentInfo": {
+      "tag": "generate_sentences"
+    },
+    "messages": [{
+      "text": {
+        "text": ["Hello! How can I help you?"],
+        "redactedText": ["Hello! How can I help you?"]
+      },
+      "responseType": "HANDLER_PROMPT",
+      "source": "VIRTUAL_AGENT"
+    }],
+    "text": "hi",
+    "languageCode": "en"
+  }
