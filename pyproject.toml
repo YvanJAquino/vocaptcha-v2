@@ -13,6 +13,7 @@ uvicorn = {extras = ["standard"], version = "^0.18.2"}
 cxwebhooks = "^0.0.10"
 google-cloud-firestore = "^2.5.3"
 fuzzywuzzy = {extras = ["speedup"], version = "^0.18.0"}
+google-cloud-dialogflow-cx = "^1.13.0"
 
 
 [build-system]

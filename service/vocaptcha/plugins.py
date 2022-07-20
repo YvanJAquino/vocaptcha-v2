@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import List, Callable
 from functools import partial
 
@@ -7,10 +8,33 @@ from starlette.responses import JSONResponse
 from starlette.routing import Mount, Route
 from pydantic import ValidationError
 
+from google.cloud import dialogflowcx_v3 as cx
+from google.protobuf.duration_pb2 import Duration
+
 from cxwebhooks import WebhookRequest, WebhookResponse
 
 CHALLENGES = 'challenges'
 TEMPLATES = 'templates'
+
+class EntityTypes:
+    sys_any = "projects/-/locations/-/agents/-/entityTypes/sys.any"
+
+@dataclass
+class Pages:
+    generate: cx.Page
+    verify: cx.Page
+
+    def yield_pair(self):
+        return self.generate, self.verify
+
+@dataclass
+class Webhooks:
+    generate: cx.Webhook
+    verify: cx.Webhook
+
+    def yield_pair(self):
+        return self.generate, self.verify
+
 
 class VoCaptchaPlugin(ABC):
 
@@ -95,3 +119,32 @@ class VoCaptchaPlugin(ABC):
         )
         response = JSONResponse(model_response.dict(exclude_none=True))
         return response
+
+    @property
+    def pages(self):
+        generate_page = cx.Page()
+        generate_page.display_name = "generate-" + self.mount[1:]
+
+
+        verify_page = cx.Page()
+        verify_page.display_name = "verify-" + self.mount[1:]
+        return Pages(
+            generate=generate_page,
+            verify=verify_page
+        )
+
+    @property
+    def webhooks(self):
+        generate_webhook = cx.Webhook()
+        generate_webhook.display_name = "generate-" + self.mount[1:]
+        generate_webhook.timeout = Duration(seconds=7)
+        generate_webhook.generic_web_service.uri = "https://replace.me"
+
+        verify_webhook = cx.Webhook()
+        verify_webhook.display_name = "verify-" + self.mount[1:]
+        verify_webhook.timeout = Duration(seconds=7)
+        verify_webhook.generic_web_service.uri = "https://replace.me"
+        return Webhooks(
+            generate=generate_webhook,
+            verify=verify_webhook
+        )
