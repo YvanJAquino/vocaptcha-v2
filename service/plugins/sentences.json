@@ -1,0 +1,19 @@
+{
+  "challenges": [
+    "Coffee is best served hot",
+    "The rain in Spain stays mainly in the plain",
+    "The quick brown fox jumps over a lazy dog",
+    "Pack my box with five dozen liquor jugs",
+    "It is time to pay taxes"
+  ],
+  "templates": {
+    "verify": {
+      "text": "Cool.  We sent you the following sentence: {challenge} and you responded: {challenge_response}.  These two {match}.",
+      "ssml": ""
+    },
+    "generate": {
+      "text": "Please repeat the following sentence after me: {sentence}",
+      "ssml": "Please repeat the following sentence after me: {sentence}"
+    }
+  }
+}

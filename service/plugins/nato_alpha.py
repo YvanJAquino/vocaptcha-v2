@@ -13,7 +13,8 @@ class NATOAlphaPlugin(VoCaptchaPlugin):
     TYPE = "nato-alphabet-passphrase"
     DOC = "nato-alphabet"
     PARAMS = {
-        "num_words": 3
+        "num_words": 3,
+        "fuzz_threshold": 70
     }
 
     def challenge(self):
@@ -63,7 +64,8 @@ class NATOAlphaPlugin(VoCaptchaPlugin):
         challenge_response = parameters.get('challenge-response')
         ratio = fuzz.ratio(challenge, challenge_response)
         print(f"{self.TYPE} - FUZZ RATIO: ", ratio)
-        match = 'match' if ratio > 80 else "don't match"
+        print(f"challenge: {challenge} - response: {challenge_response}")
+        match = 'match' if ratio > self.PARAMS['fuzz_threshold'] else "don't match"
         is_match = True if match == 'match' else False
         text = templates['verify']['text'].format(
             challenge=challenge,

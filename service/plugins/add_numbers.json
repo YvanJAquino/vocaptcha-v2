@@ -1,0 +1,13 @@
+{
+  "challenges": {},
+  "templates": {
+    "verify": {
+      "ssml": "",
+      "text": ""
+    },
+    "generate": {
+      "text": "What is the sum of {num1} and {num2}?",
+      "ssml": "What is the sum of {num1} and {num2}?"
+    }
+  }
+}

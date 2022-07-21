@@ -1,0 +1,40 @@
+{
+  "challenges": {
+    "k": "kilo",
+    "l": "lima",
+    "y": "yankee",
+    "w": "whiskey",
+    "e": "echo",
+    "j": "juliet",
+    "g": "golf",
+    "u": "uniform",
+    "p": "papa",
+    "i": "india",
+    "r": "romeo",
+    "n": "november",
+    "f": "foxtrot",
+    "m": "mike",
+    "t": "tango",
+    "c": "charlie",
+    "b": "bravo",
+    "s": "sierra",
+    "d": "delta",
+    "v": "victor",
+    "z": "zulu",
+    "x": "xray",
+    "a": "alpha",
+    "q": "quebec",
+    "o": "oscar",
+    "h": "hotel"
+  },
+  "templates": {
+    "verify": {
+      "ssml": "",
+      "text": "Cool.  We sent you the following passphrase: {challenge} and you responded: {challenge_response}.  These two {match}."
+    },
+    "generate": {
+      "ssml": "Please repeat the following phrase after me: {phrase}.",
+      "text": "Please repeat the following phrase after me: <prosody rate=\"slow\">{phrase}</prosody>."
+    }
+  }
+}
