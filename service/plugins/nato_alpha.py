@@ -1,7 +1,9 @@
 from secrets import SystemRandom
 from string import ascii_lowercase
-from cxwebhooks import WebhookRequest, WebhookResponse
 
+from fuzzywuzzy import fuzz
+
+from cxwebhooks import WebhookRequest, WebhookResponse
 from service.vocaptcha.plugins import VoCaptchaPlugin
 
 
@@ -59,7 +61,9 @@ class NATOAlphaPlugin(VoCaptchaPlugin):
             response.add_text_response("Something went wrong.  Please reach out!")
             return response
         challenge_response = parameters.get('challenge-response')
-        match = 'match' if challenge == challenge_response else "don't match"
+        ratio = fuzz.ratio(challenge, challenge_response)
+        print(f"{self.TYPE} - FUZZ RATIO: ", ratio)
+        match = 'match' if ratio > 80 else "don't match"
         is_match = True if match == 'match' else False
         text = templates['verify']['text'].format(
             challenge=challenge,

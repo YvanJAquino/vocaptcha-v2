@@ -51,7 +51,7 @@ class SentencesPlugin(VoCaptchaPlugin):
             return response
         challenge_response = parameters.get('challenge-response')
         ratio = fuzz.ratio(challenge, challenge_response)
-        print("FUZZ RATIO: ", ratio)
+        print(f"{self.TYPE} - FUZZ RATIO: ", ratio)
         match = 'match' if ratio > 80 else "don't match"
         is_match = True if match == 'match' else False
         text = templates['verify']['text'].format(

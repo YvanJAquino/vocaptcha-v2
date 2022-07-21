@@ -108,13 +108,10 @@ class VoCaptchaServer:
         self.agent_name = agent_name
         self.flow_name = self.agent_name + f'/flows/{flow_name}'
         
-    def __call__(self):
-        """
-        Creates an instance of the plugins, creates routes for those plugins,
-        mounts them to their path(s), and returns an instance of Starlette that
-        uvicorn will accept.  
-        """
-        routes = []
+        self.plugin_instances = self.initialize_plugins()
+
+    def initialize_plugins(self):
+        plugin_instances = []
         for plugin in self.plugins:
             module_path = f'service.{self.plugin_folder}.{plugin.module}'
             module = importlib.import_module(module_path)
@@ -122,9 +119,20 @@ class VoCaptchaServer:
             instance = plugin(
                 cache=self.cache
             )
+            plugin_instances.append(instance)
+        return plugin_instances
+
+
+    def __call__(self):
+        """
+        Creates an instance of the plugins, creates routes for those plugins,
+        mounts them to their path(s), and returns an instance of Starlette that
+        uvicorn will accept.  
+        """
+        routes = []
+        for instance in self.plugin_instances:
             plugin_routes = instance()
-            routes.append(plugin_routes)
-        
+            routes.append(plugin_routes)       
         return Starlette(routes=routes)
 
     @property
@@ -139,15 +147,8 @@ class VoCaptchaServer:
     @property
     def plugin_webhooks(self):
         plugin_webhooks = []
-        for plugin in self.plugins:
-            module_path = f'{self.plugin_folder}.{plugin.module}'
-            module = importlib.import_module(module_path)
-            plugin = getattr(module, plugin.cls)
-            instance = plugin(
-                cache=self.cache
-            )
+        for instance in self.plugin_instances:
             plugin_webhooks.append(instance.webhooks)
-
         return {
             webhook.display_name: webhook
             for _webhook in plugin_webhooks
@@ -189,15 +190,8 @@ class VoCaptchaServer:
     @property
     def plugin_pages(self):
         plugin_pages = []
-        for plugin in self.plugins:
-            module_path = f'{self.plugin_folder}.{plugin.module}'
-            module = importlib.import_module(module_path)
-            plugin = getattr(module, plugin.cls)
-            instance = plugin(
-                cache=self.cache
-            )
+        for instance in self.plugin_instances:
             plugin_pages.append(instance.pages)
-
         return {
             page.display_name: page
             for _page in plugin_pages
