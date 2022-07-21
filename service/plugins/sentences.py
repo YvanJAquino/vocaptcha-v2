@@ -12,7 +12,7 @@ class SentencesPlugin(VoCaptchaPlugin):
     TYPE = "sentence-repetition"
     DOC = "sentences"
     PARAMS = {
-        "num_words": 3
+        "fuzz_threshold": 70
     }
 
     def challenge(self):
@@ -52,7 +52,8 @@ class SentencesPlugin(VoCaptchaPlugin):
         challenge_response = parameters.get('challenge-response')
         ratio = fuzz.ratio(challenge, challenge_response)
         print(f"{self.TYPE} - FUZZ RATIO: ", ratio)
-        match = 'match' if ratio > 80 else "don't match"
+        print(f"challenge: {challenge} - response: {challenge_response}")
+        match = 'match' if ratio > self.PARAMS['fuzz_threshold'] else "don't match"
         is_match = True if match == 'match' else False
         text = templates['verify']['text'].format(
             challenge=challenge,
