@@ -1,4 +1,5 @@
 import copy
+import argparse
 import json
 import importlib
 
@@ -66,8 +67,44 @@ class VoCaptchaDataManager:
             source_doc = source_doc_ref.get()
             target_doc_ref.set(source_doc.to_dict())
 
-            
 
-manager = VoCaptchaManager()
-data_manager = VoCaptchaDataManager(manager.config)
-data_manager.backup_plugin_documents()
+
+class VoCaptchaCommander:
+
+    LOAD = "load"
+    DEFAULT = "default"
+
+    def __init__(self):
+        self.manager = VoCaptchaManager()
+        self.data = VoCaptchaDataManager(self.manager.config)
+
+        self.parser = argparse.ArgumentParser()
+        self.subparsers = self.parser.add_subparsers(dest="subparser")
+        self.load_parser = self.subparsers.add_parser(self.LOAD)
+        self.load_parser.add_argument("collection_name", nargs="?", default=self.DEFAULT)
+        self.args = self.parser.parse_args()
+        print(self.args)
+        self.route_command()
+
+    def route_command(self):
+        if self.args.subparser == self.LOAD:
+            self.load()
+        elif self.args.subparser == self.CHECK:
+            self.check()
+        else:
+            raise KeyError("Oops, that's not a recognized command")
+
+    def load(self):
+        if self.args.collection_name == self.DEFAULT:
+            self.data.load_plugin_documents()
+        else:
+            fs = firestore.Client()
+            coll = fs.collection(self.args.collection_name)
+            self.data.load_plugin_documents(coll=coll)
+
+    def check(self):
+        print("check not implemented yet..!")
+        NotImplemented
+
+if __name__ == "__main__":
+    cli = VoCaptchaCommander()

@@ -6,6 +6,7 @@ from cxwebhooks import WebhookRequest, WebhookResponse
 from service.vocaptcha.plugins import VoCaptchaPlugin
 
 
+
 class SentencesPlugin(VoCaptchaPlugin):
 
     MOUNT = "/sentences"
